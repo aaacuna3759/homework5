@@ -1,0 +1,14 @@
+KNN Classification Results
+
+Not Pre Processed (13548 words):
+knn = 1     accuracy = 59.7%
+knn = 3     accuracy = 60.7%
+knn = 5     accuracy = 59.2%
+knn = 20    accuracy = 65.67%
+
+
+Pre Processed (447 words):
+knn = 1     accuracy = 67.16%
+knn = 3     accuracy = 67.16%
+knn = 5     accuracy = 66.67%
+knn = 20    accuracy = 65.67%
