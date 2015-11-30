@@ -147,17 +147,19 @@ public class FileProcess {
 		}
 
 		if (DEBUG) {
-			for (char c : characters) {
-				System.out.print(c);
-			}
+			// for (char c : characters) {
+			// System.out.print(c);
+			// }
 		}
 
+		if (process) {
+			System.out.println("Eliminated " + eliminateWordByFreq(frequency) + " words");
+		} else {
+			System.out.println("Eliminated " + eliminateWordByFreq(0) + " words");
+		}
+		
 		if (DEBUG) {
-			if (process) {
-				System.out.println("Eliminated " + eliminateWordByFreq(frequency) + " words");
-			} else {
-				System.out.println("Eliminated " + eliminateWordByFreq(0) + " words");
-			}
+			
 			System.out.println("VOCABULARY:\t\t" + vocabulary);
 			System.out.println("SPAM VOCABULARY:\t" + spamVocab);
 			System.out.println("REGULAR VOCABULARY:\t" + notSpamVocab);
