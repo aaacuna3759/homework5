@@ -3,7 +3,10 @@ import java.util.Map;
 
 public class NaiveBayes {
 
+	public static final boolean DEBUG = false;
 	FileProcess testSet, trainingSet;
+
+	boolean process = false;
 	// Map<class, count>
 	Map<Integer, Integer> classificationCounts = new HashMap<Integer, Integer>();
 	Map<Integer, Double> classificationProbability = new HashMap<Integer, Double>();
@@ -11,12 +14,13 @@ public class NaiveBayes {
 	Map<Integer, Map<String, Double>> classWordProbability = new HashMap<Integer, Map<String, Double>>();
 	Map<String, Integer> predictedClassifications = new HashMap<String, Integer>();
 
-	public NaiveBayes(String testSetDirectory, String trainingSetDirectory) {
+	public NaiveBayes(String testSetDirectory, String trainingSetDirectory, boolean process, Integer freqThreshold) {
+		this.process = process;
 		testSet = new FileProcess(testSetDirectory);
 		trainingSet = new FileProcess(trainingSetDirectory);
 
-		testSet.process();
-		trainingSet.process();
+		testSet.process(process, freqThreshold);
+		trainingSet.process(process, freqThreshold);
 
 		// building class counts
 		for (Integer type : FileProcess.classifications) {
@@ -30,12 +34,14 @@ public class NaiveBayes {
 
 		buildClassWordProbability();
 
-		System.out.println(classificationCounts);
-		System.out.println(classificationProbability);
-		System.out.println(trainingSet.getTotalWordCount());
-		System.out.println(trainingSet.getClassWordCount());
-		System.out.println(classWordProbability.get(FileProcess.SPAM));
-		System.out.println(classWordProbability.get(FileProcess.NOT_SPAM));
+		if (DEBUG) {
+			System.out.println(classificationCounts);
+			System.out.println(classificationProbability);
+			System.out.println(trainingSet.getTotalWordCount());
+			System.out.println(trainingSet.getClassWordCount());
+			System.out.println(classWordProbability.get(FileProcess.SPAM));
+			System.out.println(classWordProbability.get(FileProcess.NOT_SPAM));
+		}
 
 	}
 
@@ -170,21 +176,37 @@ public class NaiveBayes {
 
 		for (String fileName : predictedClassifications.keySet()) {
 			if (predictedClassifications.get(fileName).equals(FileProcess.SPAM)) {
-				System.out.println(fileName + "\tSPAM");
+
+				if (DEBUG) {
+					System.out.println(fileName + "\tSPAM");
+				}
+
 				if (fileName.substring(0, 2).equals("sp")) {
 					correct++;
 				}
 			} else {
-				System.out.println(fileName + "\tNOT SPAM");
+
+				if (DEBUG) {
+					System.out.println(fileName + "\tNOT SPAM");
+				}
+				
 				if (!fileName.substring(0, 2).equals("sp")) {
 					correct++;
 				}
 			}
 		}
 
+		if (process) {
+			System.out.println("***********************************\nWITH PRE-PROCESSING");
+		} else {
+			System.out.println("***********************************\nWITHOUT PRE-PROCESSING");
+		}
+
 		System.out.println("\nCorrectly predicted " + correct + " out of " + predictedClassifications.size());
 
 		System.out.println("Accuracy: " + correct / (double) predictedClassifications.size() * 100 + "%");
+
+		System.out.println("***********************************");
 
 	}
 
