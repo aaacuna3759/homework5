@@ -12,10 +12,14 @@ import java.util.StringTokenizer;
 public class FileProcess {
 
 	public static final Integer NOT_SPAM = 0, SPAM = 1, ERROR = -1;
+	public static final Integer[] classifications = { NOT_SPAM, SPAM, ERROR };
 
 	String folderPath;
 	File folder;
-	List<Map<String, Integer>> termVectors = new ArrayList<Map<String, Integer>>();
+	private Integer totalWordCount;
+	private Map<Integer, Integer> classWordCount = new HashMap<Integer,Integer>();
+	// List<Map<String, Integer>> termVectors = new ArrayList<Map<String,
+	// Integer>>();
 	Map<String, Integer> vocabulary = new HashMap<String, Integer>();
 	Map<String, Integer> spamVocab = new HashMap<String, Integer>();
 	Map<String, Integer> notSpamVocab = new HashMap<String, Integer>();
@@ -29,6 +33,11 @@ public class FileProcess {
 
 		this.folderPath = folderPath;
 		this.folder = new File(folderPath);
+		totalWordCount = 0;
+		
+		for(Integer type: classifications){
+			classWordCount.put(type, 0);
+		}
 
 	}
 
@@ -43,7 +52,7 @@ public class FileProcess {
 		// Folder iterator
 		for (File file : folder.listFiles()) {
 			String fileName = file.getName();
-			System.out.println(fileName);
+			System.out.println("\t" + fileName);
 
 			Map<String, Integer> wordCount = new HashMap<String, Integer>();
 			Map<Map<String, Integer>, Integer> classification = new HashMap<Map<String, Integer>, Integer>();
@@ -81,12 +90,14 @@ public class FileProcess {
 							} else {
 								spamVocab.put(word, 1);
 							}
+							classWordCount.put(SPAM, classWordCount.get(SPAM) + 1);
 						} else {
 							if (notSpamVocab.containsKey(word)) {
-								notSpamVocab.put(word, spamVocab.get(word) + 1);
+								notSpamVocab.put(word, notSpamVocab.get(word) + 1);
 							} else {
 								notSpamVocab.put(word, 1);
 							}
+							classWordCount.put(NOT_SPAM, classWordCount.get(NOT_SPAM) + 1);
 						}
 
 						// Document index
@@ -97,6 +108,9 @@ public class FileProcess {
 							wordCount.put(word, 1);
 							System.out.println(fileName + "\tAdded new word: " + word + " - " + wordCount.get(word));
 						}
+						
+						totalWordCount++;
+						
 					}
 
 					// load next line
@@ -122,7 +136,41 @@ public class FileProcess {
 		 * for (char c : characters) { System.out.print(c); }
 		 */
 
-		System.out.println(vocabulary);
+		System.out.println("VOCABULARY:\t\t" + vocabulary);
+		System.out.println("SPAM VOCABULARY:\t" + spamVocab);
+		System.out.println("REGULAR VOCABULARY:\t" + notSpamVocab);
+	}
+
+	// public List<Map<String, Integer>> getTermVectors() {
+	// return termVectors;
+	// }
+
+	// public void setTermVectors(List<Map<String, Integer>> termVectors) {
+	// this.termVectors = termVectors;
+	// }
+
+	public Map<String, Integer> getVocabulary() {
+		return vocabulary;
+	}
+
+	public Map<String, Integer> getSpamVocab() {
+		return spamVocab;
+	}
+
+	public Map<String, Integer> getNotSpamVocab() {
+		return notSpamVocab;
+	}
+
+	public Map<String, Map<Map<String, Integer>, Integer>> getDocuments() {
+		return documents;
+	}
+
+	public Integer getTotalWordCount() {
+		return totalWordCount;
+	}
+
+	public Map<Integer, Integer> getClassWordCount() {
+		return classWordCount;
 	}
 
 }
