@@ -152,14 +152,15 @@ public class FileProcess {
 			// }
 		}
 
+		Integer numWords;
 		if (process) {
-			System.out.println("Eliminated " + eliminateWordByFreq(frequency) + " words");
+			numWords = eliminateWordByFreq(frequency);
 		} else {
-			System.out.println("Eliminated " + eliminateWordByFreq(0) + " words");
+			numWords = eliminateWordByFreq(0);
 		}
 		
 		if (DEBUG) {
-			
+			System.out.println("Eliminated " + numWords + " words");
 			System.out.println("VOCABULARY:\t\t" + vocabulary);
 			System.out.println("SPAM VOCABULARY:\t" + spamVocab);
 			System.out.println("REGULAR VOCABULARY:\t" + notSpamVocab);
