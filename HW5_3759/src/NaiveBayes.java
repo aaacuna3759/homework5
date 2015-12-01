@@ -3,7 +3,9 @@ import java.util.Map;
 
 public class NaiveBayes {
 
+	// Flag that will print messages for debugging
 	public static final boolean DEBUG = false;
+
 	FileProcess testSet, trainingSet;
 
 	boolean process = false;
@@ -72,7 +74,7 @@ public class NaiveBayes {
 	public void buildClassWordProbability() {
 
 		// For ease of access
-		Integer vocabCount = trainingSet.getTotalWordCount();
+		// Integer vocabCount = trainingSet.getTotalWordCount();
 		Map<Integer, Integer> totalClassWords = trainingSet.getClassWordCount();
 		Map<String, Double> spamProb = new HashMap<String, Double>();
 		Map<String, Double> nSpamProb = new HashMap<String, Double>();
@@ -89,6 +91,15 @@ public class NaiveBayes {
 				Double wordProb = (wordSpamCount + 1)
 						/ (double) (totalClassWords.get(FileProcess.SPAM) + trainingSet.getVocabulary().size());
 				spamProb.put(word, wordProb);
+
+				if (spamProb.get(word) == 0.0) {
+					System.out.println(word + " spam is 0");
+				}
+
+			} else {
+				Double wordProb = 1
+						/ (double) (totalClassWords.get(FileProcess.SPAM) + trainingSet.getVocabulary().size());
+				spamProb.put(word, wordProb);
 			}
 			if (trainingSet.getNotSpamVocab().containsKey(word)) {
 
@@ -98,12 +109,52 @@ public class NaiveBayes {
 				Double wordProb = (wordNSpamCount + 1)
 						/ (double) (totalClassWords.get(FileProcess.NOT_SPAM) + trainingSet.getVocabulary().size());
 				nSpamProb.put(word, wordProb);
+
+				if (nSpamProb.get(word) == 0.0) {
+					System.out.println(word + " not spam is 0");
+				}
 			}
+
 		}
 
 		classWordProbability.put(FileProcess.SPAM, spamProb);
 		classWordProbability.put(FileProcess.NOT_SPAM, nSpamProb);
 
+	}
+
+	public Integer logClassify(Map<String, Integer> testPoint) {
+
+		Integer predictedClass = FileProcess.ERROR;
+
+		// Probability of email being SPAM, at the end greatest wins
+		// Double spamProb =
+		// Math.log(classificationProbability.get(FileProcess.SPAM));
+		Double spamProb = 0.0;
+		// Double nSpamProb =
+		// Math.log(classificationProbability.get(FileProcess.NOT_SPAM));
+		Double nSpamProb = 0.0;
+
+		for (String word : testPoint.keySet()) {
+			// SPAM Probability building
+			if (classWordProbability.get(FileProcess.SPAM).containsKey(word)) {
+				spamProb += Math.log(Math.pow(classWordProbability.get(FileProcess.SPAM).get(word)
+						* classificationProbability.get(FileProcess.SPAM), testPoint.get(word)));
+			}
+
+			// NOT_SPAM Probability building
+			if (classWordProbability.get(FileProcess.NOT_SPAM).containsKey(word)) {
+				nSpamProb += Math.log(Math.pow(classWordProbability.get(FileProcess.NOT_SPAM).get(word)
+						* classificationProbability.get(FileProcess.NOT_SPAM), testPoint.get(word)));
+			}
+		}
+
+		if (spamProb > nSpamProb) {
+			predictedClass = FileProcess.SPAM;
+		} else {
+			predictedClass = FileProcess.NOT_SPAM;
+		}
+
+		return predictedClass;
 	}
 
 	public Integer classify(Map<String, Integer> testPoint) {
@@ -117,16 +168,30 @@ public class NaiveBayes {
 		for (String word : testPoint.keySet()) {
 			// SPAM Probability building
 			if (classWordProbability.get(FileProcess.SPAM).containsKey(word)) {
-				spamProb *= classWordProbability.get(FileProcess.SPAM).get(word);
+				if (Math.pow(classWordProbability.get(FileProcess.SPAM).get(word), testPoint.get(word)) == 0.0) {
+					System.out.print("SPAM " + word + " is 0.0 ");
+				} else {
+					spamProb *= Math.pow(classWordProbability.get(FileProcess.SPAM).get(word), testPoint.get(word));
+					System.out.println("SPAM: " + spamProb);
+				}
 			}
-
 			// NOT_SPAM Probability building
 			if (classWordProbability.get(FileProcess.NOT_SPAM).containsKey(word)) {
-				nSpamProb *= classWordProbability.get(FileProcess.NOT_SPAM).get(word);
+				if (Math.pow(classWordProbability.get(FileProcess.NOT_SPAM).get(word), testPoint.get(word)) == 0.0) {
+					System.out.print("NOT SPAM " + word + " is 0.0 ");
+				} else {
+					nSpamProb *= Math.pow(classWordProbability.get(FileProcess.NOT_SPAM).get(word),
+							testPoint.get(word));
+					System.out.println("NOT SPAM" + nSpamProb);
+				}
 			}
 		}
 
-		if (spamProb > nSpamProb) {
+		if (DEBUG) {
+			System.out.println(spamProb + ", " + nSpamProb);
+		}
+
+		if (spamProb >= nSpamProb) {
 			predictedClass = FileProcess.SPAM;
 		} else {
 			predictedClass = FileProcess.NOT_SPAM;
@@ -143,16 +208,6 @@ public class NaiveBayes {
 		return 0.0;
 	}
 
-	/**
-	 * This is the probability of the word belonging to the class
-	 * 
-	 * @return probability P(w|c)
-	 */
-	public double probabilityWordClass(String word, Integer classification) {
-
-		return 0.0;
-	}
-
 	public double probability(Map<String, Integer> testPoint, Integer classification) {
 
 		return 0.0;
@@ -165,9 +220,14 @@ public class NaiveBayes {
 
 			Map<Map<String, Integer>, Integer> wordFreqClass = testSet.getDocuments().get(fileName);
 
+			if (DEBUG) {
+				System.out.print(fileName + ": ");
+			}
+
 			// there is only one Map inside and this accesses it.
 			for (Map<String, Integer> wordFreq : wordFreqClass.keySet()) {
-				predictedClassifications.put(fileName, classify(wordFreq));
+				// predictedClassifications.put(fileName, classify(wordFreq));
+				predictedClassifications.put(fileName, logClassify(wordFreq));
 			}
 		}
 
@@ -189,7 +249,7 @@ public class NaiveBayes {
 				if (DEBUG) {
 					System.out.println(fileName + "\tNOT SPAM");
 				}
-				
+
 				if (!fileName.substring(0, 2).equals("sp")) {
 					correct++;
 				}
