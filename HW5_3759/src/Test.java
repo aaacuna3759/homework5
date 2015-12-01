@@ -27,7 +27,7 @@ public class Test {
 		// try {
 		// trainingProcess.knnCSV(trainingProcess.getVocabulary(),
 		// "knnTrain.csv");
-		// testProcess.knnCSV(testProcess.getVocabulary(), "knnTest.csv");
+		// testProcess.knnCSV(trainingProcess.getVocabulary(), "knnTest.csv");
 		// } catch (IOException e) {
 		// e.printStackTrace();
 		// }
@@ -44,7 +44,7 @@ public class Test {
 		// try {
 		// trainingPreProcess.knnCSV(trainingProcess.getVocabularyd(),
 		// "knnTrainPP.csv");
-		// testPreProcess.knnCSV(testProcess.getVocabulary(), "knnTestPP.csv");
+		// testPreProcess.knnCSV(trainingProcess.getVocabulary(), "knnTestPP.csv");
 		// } catch (IOException e) {
 		// e.printStackTrace();
 		// }
