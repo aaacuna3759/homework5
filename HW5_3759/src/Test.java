@@ -9,6 +9,7 @@ public class Test {
 		HashMap<String, Integer> fullMap = new HashMap<String, Integer>();
 		HashMap<String, Integer> processedMap = new HashMap<String, Integer>();
 
+		//hrllo
 		// Output csv files for use in KNN classification
 		fullMap = fileProcess.fullMap(); // Create map of all words from all emails
 		fileProcess.knnCSV(fullMap, "train", "knnTrain.csv"); // Output csv file for training data
